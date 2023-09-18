@@ -42,6 +42,7 @@ usethis::git_sitrep()
 usethis::use_git()
 
 usethis::use_github() 
+usethis::git_default_branch_rediscover()
 
 usethis::create_github_token()
 # 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
