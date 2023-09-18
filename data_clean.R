@@ -43,4 +43,9 @@ usethis::use_git()
 
 usethis::use_github() 
 
+usethis::create_github_token()
+# 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
+
+gitcreds::gitcreds_set()
+
 
