@@ -1,6 +1,11 @@
+library(here)
+
+
 library(dplyr)
 library(tidyverse)
 getwd()
+
+
 
 raw.dat <- read.csv("raw_data/maternalmortality.csv", stringsAsFactors = FALSE)
 
