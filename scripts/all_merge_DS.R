@@ -16,6 +16,10 @@ source("scripts/armedconflict_DS.R")
 # Disaster DS
 source("scripts/disaster_DS.R")
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0aeca007f4e73e28179dd89f269f0c8f46fb8fcc
 # Covariates DS
 dat.covar <- read.csv("raw_data/covariates.csv", stringsAsFactors = FALSE)
 
@@ -27,9 +31,12 @@ dat.mort <- read.csv("data/mortality_clean.csv", stringsAsFactors = FALSE) %>%
 final.lst <- list(dat.covar, conflict.dat, dat.mort, dat.dis)
 
 final.lst |> reduce(left_join, by = c("ISO", "year")) -> dat.mrg
+<<<<<<< HEAD
 # drought earthquake death armed conflict if na then 0
 
 dat.mrg$earthquake
+=======
+>>>>>>> 0aeca007f4e73e28179dd89f269f0c8f46fb8fcc
 
 write.csv(dat.mrg, "data/final_dat.csv", row.names = FALSE)
 
