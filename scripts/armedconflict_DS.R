@@ -7,6 +7,8 @@ here()
 
 #names(conflict.dat)
 
+# total.best Best estimate for total number of battle related deaths
+
 # binary variable indicat- ing the presence of conflict for each country–year observation 
 # (0 = no, <25 battle-related deaths; 1 = yes, >=25 battle-related deaths) [29]
 
