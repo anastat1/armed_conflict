@@ -15,7 +15,7 @@ here()
 # Download disaster.csv
 conflict.dat <- read.csv("raw_data/conflictdata.csv", stringsAsFactors = FALSE) %>%
   group_by(ISO, year) %>% summarise(total.best = sum(best)) %>% ungroup() %>%
-  mutate(confl.ID = ifelse(total.best <25, 0, 1)) 
+  mutate(confl.IND = ifelse(total.best <25, 0, 1)) 
 
 
 

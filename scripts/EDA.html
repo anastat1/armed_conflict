@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Anastasia Teterina">
+
+<title>Exploratory Analysis Armed Conflict dataset</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="EDA_files/libs/clipboard/clipboard.min.js"></script>
+<script src="EDA_files/libs/quarto-html/quarto.js"></script>
+<script src="EDA_files/libs/quarto-html/popper.min.js"></script>
+<script src="EDA_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="EDA_files/libs/quarto-html/anchor.min.js"></script>
+<link href="EDA_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="EDA_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="EDA_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="EDA_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="EDA_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Exploratory Analysis Armed Conflict dataset</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Anastasia Teterina </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<p>This report contains results of exporatory data analysis for armed conflict dataset.</p>
+<section id="loading-packages-and-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="loading-packages-and-dataset">Loading packages and dataset</h3>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># rfa = ready for analysis</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>rfa <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">paste0</span>(<span class="fu">here</span>(), <span class="st">"/data/final_dat.csv"</span>), <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># before we start: any duplicated observations?</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">get_dupes</span>(rfa)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] country_name ISO          region       year         GDP         
+ [6] OECD         OECD2023     popdens      urban        agedep      
+[11] male_edu     temp         total.best   confl.IND    mat.mort    
+[16] inf.mort     neonat.mort  und5.mort    drought      earthquake  
+[21] dupe_count  
+&lt;0 rows&gt; (or 0-length row.names)</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># no duplicates, it's good</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The dataset contains following variables:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># names of variables in the dataset (can be handy for further code)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(rfa)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "country_name" "ISO"          "region"       "year"         "GDP"         
+ [6] "OECD"         "OECD2023"     "popdens"      "urban"        "agedep"      
+[11] "male_edu"     "temp"         "total.best"   "confl.IND"    "mat.mort"    
+[16] "inf.mort"     "neonat.mort"  "und5.mort"    "drought"      "earthquake"  </code></pre>
+</div>
+</div>
+<p>Looking at the dataset: outcome variables and coutry/year</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rfa <span class="sc">|&gt;</span> <span class="fu">select</span>(country_name, ISO, region, year, mat.mort, neonat.mort, inf.mort, und5.mort) <span class="sc">|&gt;</span> <span class="fu">slice_sample</span>(<span class="at">n=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>   country_name ISO                          region year mat.mort neonat.mort
+1       Ukraine UKR                  Eastern Europe 2014       24         5.8
+2       Nigeria NGA              Sub-Saharan Africa 2016      925        37.0
+3       Nigeria NGA              Sub-Saharan Africa 2007     1010        39.5
+4    Cape Verde CPV              Sub-Saharan Africa 2013       63        13.5
+5        Malawi MWI              Sub-Saharan Africa 2014      381        23.7
+6         Qatar QAT                    Western Asia 2002       13         6.1
+7         Syria SYR                    Western Asia 2008       26        10.2
+8       Jamaica JAM Latin America and the Caribbean 2017       80        10.3
+9        France FRA                  Western Europe 2007        9         2.4
+10  Timor-Leste TLS              South-eastern Asia 2004      507        31.0
+   inf.mort und5.mort
+1       8.4       9.8
+2      78.3     124.7
+3      89.8     145.6
+4      19.2      22.5
+5      39.2      57.6
+6      10.0      11.6
+7      16.2      18.9
+8      12.6      14.6
+9       3.2       4.4
+10     69.3      86.0</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rfa  <span class="sc">|&gt;</span> <span class="fu">select</span>(country_name, ISO, region, year, mat.mort, neonat.mort, inf.mort, und5.mort) <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 3,720
+Columns: 8
+$ country_name &lt;chr&gt; "Afghanistan", "Afghanistan", "Afghanistan", "Afghanistan…
+$ ISO          &lt;chr&gt; "AFG", "AFG", "AFG", "AFG", "AFG", "AFG", "AFG", "AFG", "…
+$ region       &lt;chr&gt; "Southern Asia", "Southern Asia", "Southern Asia", "South…
+$ year         &lt;int&gt; 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 200…
+$ mat.mort     &lt;int&gt; 1450, 1390, 1300, 1240, 1180, 1140, 1120, 1090, 1030, 993…
+$ neonat.mort  &lt;dbl&gt; 60.9, 59.7, 58.5, 57.2, 55.9, 54.6, 53.2, 51.7, 50.3, 48.…
+$ inf.mort     &lt;dbl&gt; 90.5, 87.9, 85.3, 82.7, 80.0, 77.3, 74.6, 71.9, 69.2, 66.…
+$ und5.mort    &lt;dbl&gt; 129.2, 125.2, 121.1, 116.9, 112.6, 108.4, 104.1, 99.9, 95…</code></pre>
+</div>
+</div>
+</section>
+<section id="countries-and-years" class="level3">
+<h3 class="anchored" data-anchor-id="countries-and-years">Countries and years</h3>
+<p>How many countries?</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(rfa<span class="sc">$</span>ISO))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 186</code></pre>
+</div>
+</div>
+<p>How many countries have armed conflicts?</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>rfa <span class="sc">|&gt;</span> <span class="fu">group_by</span>(ISO) <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="at">confl.ind.cntry =</span> <span class="fu">ifelse</span>(<span class="fu">sum</span>(confl.IND)<span class="sc">&gt;</span><span class="dv">0</span>, <span class="st">"At least 1 conflict"</span>, <span class="st">"No conflicts"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> <span class="fu">tabyl</span>(confl.ind.cntry)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>     confl.ind.cntry   n   percent
+ At least 1 conflict  86 0.4623656
+        No conflicts 100 0.5376344</code></pre>
+</div>
+</div>
+<p>Nearly half of 186 countries had a conflict at least in 1 year over the observation period.</p>
+<p>How many country/years have armed conflicts?</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>rfa <span class="sc">|&gt;</span> <span class="fu">tabyl</span>(confl.IND)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code> confl.IND    n   percent
+         0 3055 0.8212366
+         1  665 0.1787634</code></pre>
+</div>
+</div>
+<p>665 observatios (17%) have conflict.</p>
+</section>
+<section id="looking-into-the-main-outcomes-4-mortality-rates-variables" class="level3">
+<h3 class="anchored" data-anchor-id="looking-into-the-main-outcomes-4-mortality-rates-variables">Looking into the main outcomes: 4 mortality rates variables</h3>
+<p>Looking into distributions of outcome variables</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>check <span class="ot">&lt;-</span> rfa <span class="sc">|&gt;</span> <span class="fu">select</span>(mat.mort, neonat.mort, inf.mort, und5.mort)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>Hmisc<span class="sc">::</span><span class="fu">describe</span>(check)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>check 
+
+ 4  Variables      3720  Observations
+--------------------------------------------------------------------------------
+mat.mort 
+       n  missing distinct     Info     Mean      Gmd      .05      .10 
+    3294      426      743        1    210.6    280.8      5.0      7.0 
+     .25      .50      .75      .90      .95 
+    17.0     66.0    299.8    661.0    836.3 
+
+lowest :    2    3    4    5    6, highest: 1850 1960 2080 2250 2480
+--------------------------------------------------------------------------------
+neonat.mort 
+       n  missing distinct     Info     Mean      Gmd      .05      .10 
+    3700       20      499        1    16.18    14.35     1.90     2.50 
+     .25      .50      .75      .90      .95 
+    4.90    12.10    25.33    36.01    41.20 
+
+lowest : 0.8  0.9  1    1.1  1.2 , highest: 56.8 57.2 58.5 59.7 60.9
+--------------------------------------------------------------------------------
+inf.mort 
+       n  missing distinct     Info     Mean      Gmd      .05      .10 
+    3700       20      893        1     28.9    28.15     3.00     3.70 
+     .25      .50      .75      .90      .95 
+    7.60    18.90    44.52    69.80    83.30 
+
+lowest : 1.6   1.7   1.8   1.9   2    , highest: 127.9 130.2 132.9 135.6 138.1
+--------------------------------------------------------------------------------
+und5.mort 
+       n  missing distinct     Info     Mean      Gmd      .05      .10 
+    3700       20     1129        1     40.5    43.29     3.60     4.40 
+     .25      .50      .75      .90      .95 
+    9.00    22.20    61.32   104.41   131.60 
+
+lowest : 2     2.1   2.2   2.3   2.4  , highest: 208.1 213.9 215.2 219.4 224.9
+--------------------------------------------------------------------------------</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>myfun <span class="ot">&lt;-</span> <span class="cf">function</span>(outcome.var){</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(check, <span class="fu">aes</span>(<span class="at">x =</span> {{ outcome.var }})) <span class="sc">+</span> <span class="fu">geom_histogram</span>()</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">myfun</span>(mat.mort)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 426 rows containing non-finite values (`stat_bin()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">myfun</span>(neonat.mort)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 20 rows containing non-finite values (`stat_bin()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-7-2.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">myfun</span>(inf.mort)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 20 rows containing non-finite values (`stat_bin()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-7-3.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">myfun</span>(und5.mort)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 20 rows containing non-finite values (`stat_bin()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-7-4.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>All distributions are skewed; maybe log transform if needed; there are no zero values, so should be fine.</p>
+<p>There are some missing values; checking patterns and proportions of missing values</p>
+<div class="cell" data-fig.dim="[15,4]">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(VIM)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: colorspace</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: grid</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,
+which was just loaded, were retired in October 2023.
+Please refer to R-spatial evolution reports for details, especially
+https://r-spatial.org/r/2023/05/15/evolution4.html.
+It may be desirable to make the sf package available;
+package maintainers should consider adding sf to Suggests:.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>VIM is ready to use.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Suggestions and bug-reports can be submitted at: https://github.com/statistikat/VIM/issues</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'VIM'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:datasets':
+
+    sleep</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(naniar)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">aggr</span>(check, <span class="at">numbers =</span> <span class="cn">TRUE</span>, <span class="at">prop =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="1440"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">miss_var_summary</span>(check)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 3
+  variable    n_miss pct_miss
+  &lt;chr&gt;        &lt;int&gt;    &lt;dbl&gt;
+1 mat.mort       426   11.5  
+2 neonat.mort     20    0.538
+3 inf.mort        20    0.538
+4 und5.mort       20    0.538</code></pre>
+</div>
+</div>
+<p>Missing values in maternal mortality and child mortality are mostly in different country/years. Proportion of missing values in the outcome is very low in child mortality variables, and a bit higher, but still low (11%) in maternal mortality.</p>
+<p>Any relationship between presence of conflict and missingness?</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>rfa <span class="sc">|&gt;</span> <span class="fu">select</span>(confl.IND, mat.mort, neonat.mort, inf.mort, und5.mort) <span class="sc">|&gt;</span> <span class="fu">group_by</span>(confl.IND) <span class="sc">|&gt;</span> <span class="fu">miss_var_summary</span>() <span class="sc">|&gt;</span> <span class="co">#select(-n_miss) |&gt;</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> confl.IND, <span class="at">values_from =</span> <span class="fu">c</span>(pct_miss, n_miss))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 5
+  variable    pct_miss_1 pct_miss_0 n_miss_1 n_miss_0
+  &lt;chr&gt;            &lt;dbl&gt;      &lt;dbl&gt;    &lt;int&gt;    &lt;int&gt;
+1 mat.mort          5.86     12.7         39      387
+2 neonat.mort       0         0.655        0       20
+3 inf.mort          0         0.655        0       20
+4 und5.mort         0         0.655        0       20</code></pre>
+</div>
+</div>
+<p>Proportion of missing values is lower (maternal mortality) or 0 (child mortality) in the countries with armed conflicts, which means there maybe some bias, but for the goals of analysis it’s probably less concerning than in the case when cases population would have higher missingness than controls.</p>
+<p>Looking into distribution of log-transformed outcome variables by main predictor of interest (armed conflict); also, will see if there are outliers. NOTE. Armed conflict variable is not lagged, so maybe some distortions..</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>plotfun <span class="ot">&lt;-</span> <span class="cf">function</span>(outcome.var){</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(rfa, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.factor</span>(confl.IND),  <span class="at">y =</span> <span class="fu">log</span>({{ outcome.var }}))) <span class="sc">+</span> <span class="fu">geom_boxplot</span>() <span class="sc">+</span> </span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_jitter</span>(<span class="at">alpha =</span> <span class="fl">0.25</span>, <span class="at">width =</span> <span class="fl">0.2</span>)</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plotfun</span>(mat.mort)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 426 rows containing non-finite values (`stat_boxplot()`).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 426 rows containing missing values (`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotfun</span>(neonat.mort)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 20 rows containing non-finite values (`stat_boxplot()`).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 20 rows containing missing values (`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-10-2.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotfun</span>(inf.mort)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 20 rows containing non-finite values (`stat_boxplot()`).
+Removed 20 rows containing missing values (`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-10-3.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotfun</span>(und5.mort)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 20 rows containing non-finite values (`stat_boxplot()`).
+Removed 20 rows containing missing values (`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-10-4.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>There is a clear relationship; no major outliers are noticeable.</p>
+</section>
+<section id="looking-into-the-predictor-variables-distributions" class="level3">
+<h3 class="anchored" data-anchor-id="looking-into-the-predictor-variables-distributions">Looking into the predictor variables distributions</h3>
+<p>Predictors of interest can be divided into categories:</p>
+<p><strong>national wealth</strong><br>
+GDP - gross domestic product (GDP) per capita (current US dollars)<br>
+OECD Organisation for Economic Co-operation and Development (OECD) membership</p>
+<p><strong>population demographics</strong><br>
+popdens population density<br>
+urban urban residence<br>
+agedep age dependency ratio</p>
+<p><strong>population education</strong><br>
+male_edu mean number of years of educational attainment per capita</p>
+<p><strong>climate-related factors</strong><br>
+temp<br>
+drought<br>
+earthquake</p>
+<p>Checking missing data in those:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>check <span class="ot">&lt;-</span> rfa <span class="sc">|&gt;</span> <span class="fu">select</span>(GDP, OECD, popdens, urban, agedep, temp, drought, earthquake)</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="fu">aggr</span>(check, <span class="at">numbers =</span> <span class="cn">TRUE</span>, <span class="at">prop =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">miss_var_summary</span>(check)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 3
+  variable   n_miss pct_miss
+  &lt;chr&gt;       &lt;int&gt;    &lt;dbl&gt;
+1 GDP            62    1.67 
+2 popdens        20    0.538
+3 urban          20    0.538
+4 temp           20    0.538
+5 OECD            0    0    
+6 agedep          0    0    
+7 drought         0    0    
+8 earthquake      0    0    </code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>rfa <span class="sc">|&gt;</span> <span class="fu">select</span>(confl.IND, GDP, OECD, popdens, urban, agedep, temp, drought, earthquake) <span class="sc">|&gt;</span> <span class="fu">group_by</span>(confl.IND) <span class="sc">|&gt;</span> <span class="fu">miss_var_summary</span>() <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span>n_miss) <span class="sc">|&gt;</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> confl.IND, <span class="at">values_from =</span> <span class="fu">c</span>(pct_miss))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 3
+  variable     `1`   `0`
+  &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt;
+1 GDP         3.46 1.28 
+2 popdens     1.20 0.393
+3 urban       1.20 0.393
+4 temp        1.20 0.393
+5 OECD        0    0    
+6 agedep      0    0    
+7 drought     0    0    
+8 earthquake  0    0    </code></pre>
+</div>
+</div>
+<p>There are missing values in 4 variables, but propotions of missing values are extremely small; it’s also slightly concerning that proportion of missing values is higher in observations with conflicts, but considering it’s extremely low overall, that shouldn’t be an issue.</p>
+<p>Next, looking at distributions of the covariate variables.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>check <span class="ot">&lt;-</span> rfa <span class="sc">|&gt;</span> <span class="fu">select</span>(GDP, OECD, popdens, urban, agedep, temp, drought, earthquake)</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>Hmisc<span class="sc">::</span><span class="fu">describe</span>(check)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>check 
+
+ 8  Variables      3720  Observations
+--------------------------------------------------------------------------------
+GDP 
+       n  missing distinct     Info     Mean      Gmd      .05      .10 
+    3658       62     3658        1    11492    15289    376.4    522.5 
+     .25      .50      .75      .90      .95 
+  1238.3   4071.9  13153.1  37880.8  48688.0 
+
+lowest : 110.461 114.367 117.86  119.262 122.962
+highest: 116787  119025  120000  120422  123679 
+--------------------------------------------------------------------------------
+OECD 
+       n  missing distinct     Info      Sum     Mean      Gmd 
+    3720        0        2    0.425      636    0.171   0.2836 
+
+--------------------------------------------------------------------------------
+popdens 
+       n  missing distinct     Info     Mean      Gmd      .05      .10 
+    3700       20     3511        1    30.57     22.9    0.000    6.887 
+     .25      .50      .75      .90      .95 
+  14.790   27.519   40.718   58.580   72.289 
+
+lowest : 0        0.000418 0.000428 0.000438 0.020686
+highest: 99.856   99.8569  99.8578  99.8587  99.8595 
+--------------------------------------------------------------------------------
+urban 
+       n  missing distinct     Info     Mean      Gmd      .05      .10 
+    3700       20     3700        1    30.69    19.82    4.133    8.687 
+     .25      .50      .75      .90      .95 
+  17.287   30.254   41.656   54.071   59.914 
+
+lowest : 0.102535 0.102985 0.103155 0.103168 0.10326 
+highest: 93.2037  93.2666  93.3189  93.3694  93.4135 
+--------------------------------------------------------------------------------
+agedep 
+       n  missing distinct     Info     Mean      Gmd      .05      .10 
+    3720        0     3720        1    61.94    21.01    39.21    42.62 
+     .25      .50      .75      .90      .95 
+   47.94    55.51    77.11    90.51    96.99 
+
+lowest : 16.172  16.3029 16.7167 17.0829 17.1992
+highest: 110.429 110.723 111.196 111.474 111.477
+--------------------------------------------------------------------------------
+temp 
+       n  missing distinct     Info     Mean      Gmd      .05      .10 
+    3700       20     3700        1    19.63    8.213    6.913    8.752 
+     .25      .50      .75      .90      .95 
+  12.928   21.958   25.869   27.482   28.098 
+
+lowest : -2.40476 -1.90655 -1.50627 -1.49477 -1.26576
+highest: 29.4245  29.4907  29.5266  29.6402  29.6764 
+--------------------------------------------------------------------------------
+drought 
+       n  missing distinct     Info      Sum     Mean      Gmd 
+    3720        0        2    0.239      325  0.08737   0.1595 
+
+--------------------------------------------------------------------------------
+earthquake 
+       n  missing distinct     Info      Sum     Mean      Gmd 
+    3720        0        2    0.229      310  0.08333   0.1528 
+
+--------------------------------------------------------------------------------</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co">#summary(check)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>3 variables are binary, the rest are continuous.</p>
+<p>Tabulating binary variables by armed conflict indicator</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>rfa <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">confl.IND.ch =</span> <span class="fu">ifelse</span>(confl.IND <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Armed conflict"</span>, <span class="st">"No conflicts"</span>), </span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">OECD.ch =</span> <span class="fu">ifelse</span>(OECD <span class="sc">==</span><span class="dv">1</span>, <span class="st">"OECD"</span>, <span class="st">"Not OECD"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>              <span class="fu">tabyl</span>(OECD.ch, confl.IND.ch) <span class="sc">|&gt;</span></span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">adorn_percentages</span>(<span class="st">"col"</span>) <span class="sc">|&gt;</span> <span class="fu">adorn_pct_formatting</span>(<span class="at">digits =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">adorn_ns</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>  OECD.ch Armed conflict   No conflicts
+ Not OECD   94.14% (626) 80.46% (2,458)
+     OECD    5.86%  (39) 19.54%   (597)</code></pre>
+</div>
+</div>
+<p>There is a clear relationship, and maybe some concern about smaller number of observations that are OECD members and have armed conflict.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>rfa <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">confl.IND.ch =</span> <span class="fu">ifelse</span>(confl.IND <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Armed conflict"</span>, <span class="st">"No conflicts"</span>), </span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">drought.ch =</span> <span class="fu">ifelse</span>(drought <span class="sc">==</span><span class="dv">1</span>, <span class="st">"drought"</span>, <span class="st">"no drought"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>              <span class="fu">tabyl</span>(drought.ch, confl.IND.ch) <span class="sc">|&gt;</span></span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">adorn_percentages</span>(<span class="st">"col"</span>) <span class="sc">|&gt;</span> <span class="fu">adorn_pct_formatting</span>(<span class="at">digits =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">adorn_ns</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code> drought.ch Armed conflict   No conflicts
+    drought   12.93%  (86)  7.82%   (239)
+ no drought   87.07% (579) 92.18% (2,816)</code></pre>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>rfa <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">confl.IND.ch =</span> <span class="fu">ifelse</span>(confl.IND <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Armed conflict"</span>, <span class="st">"No conflicts"</span>), </span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">earthquake.ch =</span> <span class="fu">ifelse</span>(earthquake <span class="sc">==</span><span class="dv">1</span>, <span class="st">"earthquake"</span>, <span class="st">"no earthquake"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>              <span class="fu">tabyl</span>(earthquake.ch, confl.IND.ch) <span class="sc">|&gt;</span></span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">adorn_percentages</span>(<span class="st">"col"</span>) <span class="sc">|&gt;</span> <span class="fu">adorn_pct_formatting</span>(<span class="at">digits =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">adorn_ns</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code> earthquake.ch Armed conflict   No conflicts
+    earthquake   16.84% (112)  6.48%   (198)
+ no earthquake   83.16% (553) 93.52% (2,857)</code></pre>
+</div>
+</div>
+<p>There is some relationship, especially for earthquakes, but no major issues with low-count cells (no extremely low count observations in each subcategory)</p>
+<p>Distributions of continuous variables vs outcome variable (maternal mortality)</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>myfun <span class="ot">&lt;-</span> <span class="cf">function</span>(cov.var){</span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(rfa, <span class="fu">aes</span>(<span class="at">x =</span> {{ cov.var }})) <span class="sc">+</span> <span class="fu">geom_histogram</span>()</span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a><span class="fu">myfun</span>(GDP)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 62 rows containing non-finite values (`stat_bin()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">myfun</span>(popdens)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 20 rows containing non-finite values (`stat_bin()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-16-2.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">myfun</span>(urban)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 20 rows containing non-finite values (`stat_bin()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-16-3.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">myfun</span>(agedep)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-16-4.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="fu">myfun</span>(temp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 20 rows containing non-finite values (`stat_bin()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-16-5.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>GDP is highly skewed; maybe log transform for visualizations and regression analysis (to prevent upper tail observations to overly affect the regression beta estimates). No major outliers are detectable in other variables. Age dependency and Temperature have bimodal distributins, not sure how it would affect analysis (our outcomes are continuous, so no direct explanation from relationship with outcomes).</p>
+<p>Just some visualization of relationships between covariates and outcome</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(rfa, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">log</span>(GDP), <span class="at">y =</span>  <span class="fu">log</span>(mat.mort) , <span class="at">color =</span>  <span class="fu">as.factor</span>(confl.IND) )) <span class="sc">+</span> <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 479 rows containing missing values (`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>myfun <span class="ot">&lt;-</span> <span class="cf">function</span>(cov.var){</span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(rfa, <span class="fu">aes</span>(<span class="at">x =</span> {{ cov.var }}, <span class="at">y =</span>  <span class="fu">log</span>(mat.mort) , <span class="at">color =</span>  <span class="fu">as.factor</span>(confl.IND) )) <span class="sc">+</span> <span class="fu">geom_point</span>()</span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="fu">myfun</span>(popdens)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 444 rows containing missing values (`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">myfun</span>(urban)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 444 rows containing missing values (`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-19-2.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">myfun</span>(agedep)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 426 rows containing missing values (`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-19-3.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">myfun</span>(temp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 444 rows containing missing values (`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="EDA_files/figure-html/unnamed-chunk-19-4.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>There is very pronounced clustering of observations, probably from the same countries. Ideally, this have to be accounted for in the models.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

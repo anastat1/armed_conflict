@@ -1,0 +1,225 @@
+---
+title: "Exploratory Analysis Armed Conflict dataset"
+author: "Anastasia Teterina"
+format: 
+  html: 
+    code-fold: true
+---
+
+This report contains results of exporatory data analysis for armed conflict dataset.
+
+### Loading packages and dataset
+```{r}
+#| message: false
+#| 
+library(tidyverse)
+library(here)
+library(janitor)
+
+# rfa = ready for analysis
+rfa <- read.csv(paste0(here(), "/data/final_dat.csv"), stringsAsFactors = FALSE)
+
+# before we start: any duplicated observations?
+get_dupes(rfa)
+# no duplicates, it's good
+```
+
+The dataset contains following variables: 
+```{r}
+# names of variables in the dataset (can be handy for further code)
+names(rfa)
+```
+Looking at the dataset: outcome variables and coutry/year
+```{r}
+rfa |> select(country_name, ISO, region, year, mat.mort, neonat.mort, inf.mort, und5.mort) |> slice_sample(n=10)
+rfa  |> select(country_name, ISO, region, year, mat.mort, neonat.mort, inf.mort, und5.mort) |> glimpse()
+```
+
+### Countries and years
+
+How many countries? 
+```{r}
+length(unique(rfa$ISO))
+```
+
+How many countries have armed conflicts? 
+```{r}
+rfa |> group_by(ISO) |> summarise(confl.ind.cntry = ifelse(sum(confl.IND)>0, "At least 1 conflict", "No conflicts")) |> 
+  ungroup() |> tabyl(confl.ind.cntry)
+```
+Nearly half of 186 countries had a conflict at least in 1 year over the observation period.
+
+How many country/years have armed conflicts? 
+```{r}
+rfa |> tabyl(confl.IND)
+```
+665 observatios (17%) have conflict.
+
+
+### Looking into the main outcomes: 4 mortality rates variables
+
+Looking into distributions of outcome variables
+```{r}
+check <- rfa |> select(mat.mort, neonat.mort, inf.mort, und5.mort)
+Hmisc::describe(check)
+myfun <- function(outcome.var){
+  ggplot(check, aes(x = {{ outcome.var }})) + geom_histogram()
+}
+myfun(mat.mort)
+myfun(neonat.mort)
+myfun(inf.mort)
+myfun(und5.mort)
+```
+
+All distributions are skewed; maybe log transform if needed; there are no zero values, so should be fine.
+
+There are some missing values; checking patterns and proportions of missing values
+```{r}
+#| fig.dim = c(15, 4)
+library(VIM)
+library(naniar)
+aggr(check, numbers = TRUE, prop = FALSE)
+miss_var_summary(check)
+```
+Missing values in maternal mortality and child mortality are mostly in different country/years. Proportion of missing values in the outcome is very low in child mortality variables, and a bit higher, but still low (11%) in maternal mortality.
+
+Any relationship between presence of conflict and missingness?
+```{r}
+rfa |> select(confl.IND, mat.mort, neonat.mort, inf.mort, und5.mort) |> group_by(confl.IND) |> miss_var_summary() |> #select(-n_miss) |>
+  pivot_wider(names_from = confl.IND, values_from = c(pct_miss, n_miss))
+```
+Proportion of missing values is lower (maternal mortality) or 0 (child mortality) in the countries with armed conflicts, which means there maybe some bias, but for the goals of analysis it's probably less concerning than in the case when cases population would have higher missingness than controls. 
+
+Looking into distribution of log-transformed outcome variables by main predictor of interest (armed conflict); also, will see if there are outliers. 
+NOTE. Armed conflict variable is not lagged, so maybe some distortions..  
+```{r}
+plotfun <- function(outcome.var){
+  ggplot(rfa, aes(x = as.factor(confl.IND),  y = log({{ outcome.var }}))) + geom_boxplot() + 
+    geom_jitter(alpha = 0.25, width = 0.2)
+}
+plotfun(mat.mort)
+plotfun(neonat.mort)
+plotfun(inf.mort)
+plotfun(und5.mort)
+```
+There is a clear relationship; no major outliers are noticeable.
+
+### Looking into the predictor variables distributions
+
+Predictors of interest can be divided into categories: 
+
+**national wealth**     
+GDP - gross domestic product (GDP) per capita (current US dollars)  
+OECD Organisation for Economic Co-operation and Development (OECD) membership    
+
+**population demographics**  
+popdens population density  
+urban urban residence   
+agedep age dependency ratio  
+
+**population education**  
+male_edu mean number of years of educational attainment per capita 
+
+**climate-related factors**  
+temp   
+drought    
+earthquake    
+  
+Checking missing data in those:  
+```{r}
+check <- rfa |> select(GDP, OECD, popdens, urban, agedep, temp, drought, earthquake)
+aggr(check, numbers = TRUE, prop = FALSE)
+miss_var_summary(check)
+rfa |> select(confl.IND, GDP, OECD, popdens, urban, agedep, temp, drought, earthquake) |> group_by(confl.IND) |> miss_var_summary() |> select(-n_miss) |>
+  pivot_wider(names_from = confl.IND, values_from = c(pct_miss))
+```
+
+There are missing values in 4 variables, but propotions of missing values are extremely small; it's also slightly concerning that proportion of missing values is higher in observations with conflicts, but considering it's extremely low overall, that shouldn't be an issue.  
+
+Next, looking at distributions of the covariate variables.  
+```{r}
+check <- rfa |> select(GDP, OECD, popdens, urban, agedep, temp, drought, earthquake)
+Hmisc::describe(check)
+#summary(check)
+```
+
+3 variables are binary, the rest are continuous. 
+
+Tabulating binary variables by armed conflict indicator
+
+```{r}
+rfa |> mutate(confl.IND.ch = ifelse(confl.IND == 1, "Armed conflict", "No conflicts"), 
+              OECD.ch = ifelse(OECD ==1, "OECD", "Not OECD")) |>
+              tabyl(OECD.ch, confl.IND.ch) |>
+  adorn_percentages("col") |> adorn_pct_formatting(digits = 2) |>
+  adorn_ns() 
+```
+
+There is a clear relationship, and maybe some concern about smaller number of observations that are OECD members and have armed conflict.
+
+```{r}
+rfa |> mutate(confl.IND.ch = ifelse(confl.IND == 1, "Armed conflict", "No conflicts"), 
+              drought.ch = ifelse(drought ==1, "drought", "no drought")) |>
+              tabyl(drought.ch, confl.IND.ch) |>
+  adorn_percentages("col") |> adorn_pct_formatting(digits = 2) |>
+  adorn_ns() 
+```
+
+```{r}
+rfa |> mutate(confl.IND.ch = ifelse(confl.IND == 1, "Armed conflict", "No conflicts"), 
+              earthquake.ch = ifelse(earthquake ==1, "earthquake", "no earthquake")) |>
+              tabyl(earthquake.ch, confl.IND.ch) |>
+  adorn_percentages("col") |> adorn_pct_formatting(digits = 2) |>
+  adorn_ns() 
+```
+There is some relationship, especially for earthquakes, but no major issues with low-count cells (no extremely low count observations in each subcategory)
+
+Distributions of continuous variables vs outcome variable (maternal mortality)
+
+```{r}
+myfun <- function(cov.var){
+  ggplot(rfa, aes(x = {{ cov.var }})) + geom_histogram()
+}
+myfun(GDP)
+myfun(popdens)
+myfun(urban)
+myfun(agedep)
+myfun(temp)
+```
+
+GDP is highly skewed; maybe log transform for visualizations and regression analysis (to prevent upper tail observations to overly affect the regression beta estimates). No major outliers are detectable in other variables.
+Age dependency and Temperature have bimodal distributins, not sure how it would affect analysis (our outcomes are continuous, so no direct explanation from relationship with outcomes). 
+
+
+Just some visualization of relationships between covariates and outcome
+```{r}
+ggplot(rfa, aes(x = log(GDP), y =  log(mat.mort) , color =  as.factor(confl.IND) )) + geom_point()
+```
+
+```{r}
+myfun <- function(cov.var){
+  ggplot(rfa, aes(x = {{ cov.var }}, y =  log(mat.mort) , color =  as.factor(confl.IND) )) + geom_point()
+}
+
+```
+
+```{r}
+myfun(popdens)
+myfun(urban)
+myfun(agedep)
+myfun(temp)
+```
+There is very pronounced clustering of observations, probably from the same countries. Ideally, this have to be accounted for in the models. 
+
+
+
+
+
+
+
+
+
+
+
+
+
