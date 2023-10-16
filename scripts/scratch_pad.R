@@ -1,3 +1,12 @@
+
+finaldata <- read.csv(here("data", "finaldata.csv"), header = TRUE)
+finaldata |>
+  dplyr::select(country_name, ISO, year, MatMor) |>
+  dplyr::filter(year < 2018) |>
+  arrange(ISO, year) |>
+  group_by(ISO) |>
+  mutate(diffmatmor = MatMor - MatMor[1L]) 
+
 # This is just a scratch pad file for different things ==========================
 
 library(usethis)
