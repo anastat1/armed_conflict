@@ -1,0 +1,98 @@
+---
+title: "Armed Conflict Table 1"
+author: Anastasia Teterina
+format: docx
+---
+
+Table 1. Summary statistics from baseline observations (year 2000) Armed Conflict dataset.   
+```{r}
+#| include: false
+library(tidyverse)
+library(here)
+library(table1)
+# filter() and lag() are functions that exist in both R packages dplyr and stats
+# make default choice the functions from the dplyr package
+filter <- dplyr::filter
+lag <- dplyr::lag
+```
+
+```{r}
+#| include: FALSE
+# rfa = ready for analysis
+rfa <- read.csv(paste0(here(), "/data/final_dat.csv"), stringsAsFactors = FALSE)
+# subset only observations from year 2000
+rfa.bl <- rfa |> filter(year == 2000)
+#names(rfa.bl)
+```
+
+```{r}
+#| echo: false
+rft <- rfa.bl |> mutate(confl.IND.ch = case_when(confl.IND == 1 ~ "Yes", 
+                                                 confl.IND == 0 ~ "No"), 
+                        drought.ch = case_when(drought == 1 ~ "Yes", 
+                                               drought == 0 ~ "No"), 
+                        eathquake.ch = case_when(earthquake == 1 ~ "Yes", 
+                                                 earthquake == 0 ~ "No"), 
+                        OECD.ch = case_when(OECD == 1 ~ "Yes", 
+                                              OECD == 0 ~ "No"))
+
+label(rft$confl.IND.ch) <- "Armed conflict"
+label(rft$drought.ch) <- "Drought"
+label(rft$eathquake.ch) <- "Earthquake"
+label(rft$temp) <- "Temperature"
+label(rft$OECD.ch) <- "OECD membership"
+label(rft$popdens) <- "Population density"
+label(rft$urban) <- "Urban residence"
+label(rft$agedep) <- "Age dependency ratio"
+label(rft$male_edu) <- "Education (yrs per capita)"
+label(rft$mat.mort) <- "Maternal mortality"
+label(rft$neonat.mort) <- "Neotatal mortality"
+label(rft$inf.mort) <- "Infant mortality"
+label(rft$und5.mort) <- "Under 5 mortality"
+label(rft$total.best) <- "Battle-related deaths"
+table1( ~ total.best + mat.mort + neonat.mort + inf.mort + und5.mort +
+          popdens + urban + agedep + OECD.ch + GDP + male_edu + 
+          drought.ch + eathquake.ch +  temp | confl.IND.ch, 
+        overall=c(left="Total"),
+        data = rft, 
+       render.continuous=c("Median [Min, Max]"), 
+       caption = "Table 1. Main outcomes and covariates, Armed conflict dataset", 
+       footnote = 
+         "Continuous variables presented as median (min, max), categorical as n(%)")
+```
+
+```{r}
+#| echo: false
+#| eval: false 
+#| file: table1_script.R
+```
+
+
+```{r}
+#| echo: false
+rfp <- rfa |>
+  dplyr::select(country_name, ISO, year, mat.mort) |>
+  dplyr::filter(year < 2018) |>
+  arrange(ISO, year) |>
+  group_by(ISO) |>
+  mutate(diffmatmor = mat.mort - mat.mort[1L]) 
+cntry.select <- rfp %>% filter(year == 2017 & diffmatmor >0) |> pull(country_name)
+rfp <- rfp |> filter(country_name %in% cntry.select)
+```
+
+{{< pagebreak >}}
+
+```{r}
+#| fig-width: 7
+#| fig-height: 5
+#| echo: false
+
+ggplot(data=rfp, aes(x=year, y=mat.mort, group=country_name)) +
+  geom_line(aes(color=country_name)) + geom_point(size = 0.3) +
+  theme_bw() + 
+  labs(y = "maternal mortailty rate per 100,000 live births", 
+       x = "Year", title = "Maternal mortality trend in selected countries") +
+   theme(legend.position="bottom") + 
+  guides(color = guide_legend(title = "Country"))
+```
+

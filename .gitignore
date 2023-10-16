@@ -4,4 +4,4 @@
 .httr-oauth
 .DS_Store
 .quarto
-scratch_pad.R
+scripts/scratch_pad.R
