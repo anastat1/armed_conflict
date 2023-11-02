@@ -1,4 +1,14 @@
+stats <- data.frame(player=c('A', 'B', 'C', 'D'), 
+                 runs=c(100, 200, 408, NA), 
+                 wickets=c(17, 20, NA, 5)) 
+# find variables containing missing values 
+var_with_miss_fn <- function(dat){
+  names(dat)[(apply(dat, 2, function(x) sum(is.na(x))>0))]
+}
+var_with_miss_fn(stats)
 
+names(stats)[(apply(stats, 2, function(x) sum(is.na(x))>0))]
+stats[unlist(apply(stats, 2, function(x) which(is.na(x))) )]
 
 # This is just a scratch pad file for different things ==========================
 
@@ -30,6 +40,22 @@ label(melanoma2$thickness) <- "Thicknessᵃ"
 
 units(melanoma2$age)       <- "years"
 units(melanoma2$thickness) <- "mm"
+
+library(tidyverse)
+library(here)
+
+rfa <- read.csv(paste0(here(), "/data/final_dat.csv"), stringsAsFactors = FALSE)
+names(rfa)
+# subset only observations from year 2000
+check <- rfa |> select(ISO, year, OECD) |> pivot_wider(names_from = year, values_from = OECD) %>%
+  drop(ISO) |>
+        rowwise |>
+        mutate(mean()) %>%
+        ungroup()
+?rowwise
+
+
+
 
 caption  <- "Basic stats"
 footnote <- "ᵃ Also known as Breslow thickness"
