@@ -1,0 +1,107 @@
+---
+title: "Bootstrap medians (stratified)"
+author: "Anastasia Teterina"
+format: pdf
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+## Week 10 In-class Assignment
+
+Differences in median (with the BCa bootstrap 95% confidence intervals)\
+\* maternal\
+\* infant\
+\* neonatal\
+\* under-5\
+mortality between the countries exposed to versus not exposed to armed
+conflict for the year 2017
+
+```{r}
+library(tidyverse)
+library(here)
+library(boot)
+# filter() and lag() are functions that exist in both R packages dplyr and stats
+# make default choice the functions from the dplyr package
+#filter <- dplyr::filter
+#lag <- dplyr::lag
+```
+
+```{r}
+# rfa = ready for analysis
+rfa <- read.csv(paste0(here(), "/data/final_dat_300923.csv"), stringsAsFactors = FALSE) |>
+  dplyr::filter(year == 2017) |>
+  select(confl.IND, mat.mort, inf.mort, neonat.mort, und5.mort)
+```
+
+```{r}
+set.seed(231)
+
+res <- matrix(NA, 4, 4)
+
+# getting rid of NAs
+rfa.mat <- rfa[!is.na(rfa[, "mat.mort"]), ]
+rfa.inf <- rfa[!is.na(rfa[, "inf.mort"]), ]
+rfa.neonat <- rfa[!is.na(rfa[, "neonat.mort"]), ]
+rfa.und5 <- rfa[!is.na(rfa[, "und5.mort"]), ]
+
+# maternal
+getmeddiff.mat <- function(data, indices) {
+  sample_data <- data[indices, ]
+  group_meds <- tapply(sample_data$mat.mort, sample_data$confl.IND, FUN = median)
+  meddiff <- group_meds[2] - group_meds[1]
+  return(meddiff)
+}
+bootout.mat <- boot(rfa.mat, statistic = getmeddiff.mat, strata = rfa.mat$confl.IND, R = 1000)
+ci.mat <- boot.ci(boot.out = bootout.mat, conf = 0.95, type = "bca")
+res[1,] <- c(nrow(rfa.mat), ci.mat$t0, ci.mat$bca[c(4,5)])
+
+# infant
+getmeddiff.inf <- function(data, indices) {
+  sample_data <- data[indices, ]
+  group_meds <- tapply(sample_data$inf.mort, sample_data$confl.IND, FUN = median)
+  meddiff <- group_meds[2] - group_meds[1]
+  return(meddiff)
+}
+bootout.inf <- boot(rfa.inf, statistic = getmeddiff.inf, strata = rfa.inf$confl.IND, R = 1000)
+ci.inf <- boot.ci(boot.out = bootout.inf, conf = 0.95, type = "bca")
+res[2, ] <- c(nrow(rfa.inf), ci.inf$t0, ci.inf$bca[c(4,5)])
+
+# neonatal
+getmeddiff.neonat <- function(data, indices) {
+  sample_data <- data[indices, ]
+  group_meds <- tapply(sample_data$neonat.mort, sample_data$confl.IND, FUN = median)
+  meddiff <- group_meds[2] - group_meds[1]
+  return(meddiff)
+}
+bootout.neonat <- boot(rfa.neonat, statistic = getmeddiff.neonat, strata = rfa.neonat$confl.IND, R = 1000)
+ci.neonat <- boot.ci(boot.out = bootout.neonat, conf = 0.95, type = "bca")
+res[3, ]  <- c(nrow(rfa.neonat), ci.neonat$t0, ci.neonat$bca[c(4,5)])
+
+# under 5
+getmeddiff.und5 <- function(data, indices) {
+  sample_data <- data[indices, ]
+  group_meds <- tapply(sample_data$und5.mort, sample_data$confl.IND, FUN = median)
+  meddiff <- group_meds[2] - group_meds[1]
+  return(meddiff)
+}
+bootout.und5 <- boot(rfa.und5, statistic = getmeddiff.und5, strata = rfa.und5$confl.IND, R = 1000)
+ci.und5 <- boot.ci(boot.out = bootout.und5, conf = 0.95, type = "bca")
+res[4, ]  <- c(nrow(rfa.und5), ci.und5$t0, ci.und5$bca[c(4,5)])
+
+
+mort.names <- c("Maternal", "Infant", "Neonatal", "Under 5")
+res.fin <- data.frame(mort.names, res)
+
+# res
+```
+
+```{r}
+library(knitr)
+kable(res.fin, digits = c(0, 0, 1, 2, 2),
+      col.names = c("Type of mortality", "N observations", "Difference", "95% CI lower", "95% CI upper"), 
+      caption = "Median mortality difference between countries with vs without armed conflict in 2017")
+```
+
+Conclusion. 
+For all 4 types of mortality, the estimates of median in countries with the armed conflicts is higher than in countries without armed conflicts; and, considering that in all cases 95% confidence interval doesn't include 0, we can be highly confident in this conclusion (i.e. it's highly improbable that these results are due to chance finding).

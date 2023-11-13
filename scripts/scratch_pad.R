@@ -1,3 +1,41 @@
+
+
+getmeddiff.new <- function(data, indices, outcome) {
+  dat <- data[!is.na(data[, outcome]), ]
+  sample_data <- dat[indices, ]
+  group_meds <- tapply(sample_data[, outcome], sample_data[, "confl.IND"], FUN = median)
+  meddiff <- group_meds[2] - group_meds[1]
+  return(meddiff)
+}
+
+
+
+
+library(tidyverse)
+library(here)
+library(ggplot2)
+# filter() and lag() are functions that exist in both R packages dplyr and stats
+# make default choice the functions from the dplyr package
+#filter <- dplyr::filter
+#lag <- dplyr::lag
+
+# rfa = ready for analysis
+rfa <- read.csv(paste0(here(), "/data/final_dat_300923.csv"), stringsAsFactors = FALSE)
+
+Hmisc::describe(rfa$mat.mort)
+Hmisc::describe(rfa$confl.IND)
+
+check <- rfa |> filter(year == 2017) 
+check |> finalfit::missing_compare(dependent = "mat.mort", explanatory = "confl.IND")
+check1 <- check |> filter(!is.na(mat.mort))
+table(check1$confl.IND)
+tapply(check1$mat.mort, check1$confl.IND, median)
+164-37.5
+check1 |> filter(confl.IND ==1) |> summarise(median(mat.mort))
+check1 |> filter(confl.IND ==0) |> summarise(median(mat.mort))
+
+
+
 stats <- data.frame(player=c('A', 'B', 'C', 'D'), 
                  runs=c(100, 200, 408, NA), 
                  wickets=c(17, 20, NA, 5)) 
