@@ -6,10 +6,8 @@
 library(tidyverse)
 library(here)
 library(boot)
-# filter() and lag() are functions that exist in both R packages dplyr and stats
-# make default choice the functions from the dplyr package
-#filter <- dplyr::filter
-#lag <- dplyr::lag
+
+?boot
 
 # rfa = ready for analysis
 rfa <- read.csv(paste0(here(), "/data/final_dat_300923.csv"), stringsAsFactors = FALSE)
@@ -63,3 +61,48 @@ quantile(bootout$t, probs = c(0.025, 0.975))
 2 * bootout$t0 - quantile(bootout$t, probs = 0.025)
 
 boot.ci(boot.out = bootout, conf = 0.95, type = c("basic", "perc", "bca"))
+
+## Playing with boot function &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+rfa <- read.csv(paste0(here(), "/data/final_dat_300923.csv"), stringsAsFactors = FALSE) |>
+  dplyr::filter(year == 2017) |>
+  select(confl.IND, mat.mort, inf.mort, neonat.mort, und5.mort)
+
+rfa.nomiss <- na.omit(rfa)
+
+getmeddiff <- function(data, indices, outcome) {
+  sample_data <- data[indices, ]
+  group_meds <- tapply(sample_data[, outcome], sample_data[, "confl.IND"], FUN = median)
+  meddiff <- group_meds[2] - group_meds[1]
+  return(meddiff)
+}
+
+getmeddiff(rfa.nomiss, "mat.mort")
+rfa.nomiss[, "mat.mort"]
+
+bootout <- boot(rfa.nomiss, statistic = getmeddiff, strata = rfa.nomiss$confl.IND, R = 1000, "mat.mort")
+bootout
+# Doesn't work
+
+# Usual bootstrap of the ratio of means using the city data
+ratio <- function(d, w) sum(d$x*w)/sum(d$u*w)
+boot(city, ratio, R = 999, stype = "w")
+
+
+# Stratified resampling for the difference of means.  In this
+# example we will look at the difference of means between the final
+# two series in the gravity data.
+# "i" (indices - the default), "f" (frequencies), or "w" (weights).
+diff.means <- function(d, f){    
+  n <- nrow(d)
+  gp1 <- 1:table(as.numeric(d$series))[1]
+  m1 <- sum(d[gp1,1]*f[gp1])/sum(f[gp1])
+  m2 <- sum(d[-gp1,1] * f[-gp1])/sum(f[-gp1])
+  ss1 <- sum(d[gp1,1]^2 * f[gp1]) - (m1 *  m1 * sum(f[gp1]))
+  ss2 <- sum(d[-gp1,1]^2 * f[-gp1]) - (m2 *  m2 * sum(f[-gp1]))
+  c(m1 - m2, (ss1 + ss2)/(sum(f) - 2))
+}
+grav1 <- gravity[as.numeric(gravity[,2]) >= 7,]
+boot(grav1, diff.means, R = 999, stype = "f", strata = grav1[,2])
+
+1:table(as.numeric(gravity$series))[1]
+gravity[1:8, 1]
